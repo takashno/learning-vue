@@ -5,9 +5,14 @@
         <div class="col-md-12 text-left">
           <h2>Example&nbsp;Table</h2>
           <small>
-            Bootstrap4のTableComponentsを利用したテーブルの例。
+            Bootstrap4の「Table&nbsp;Components」を利用したテーブルの例。<br/>
+            プロフィール管理システムを模したサンプルデータとなる。<br/>
+            Bootstrap4自体のドキュメントは<a href="https://getbootstrap.com/docs/4.1/content/tables/">こちら</a>。<br/>
+            このサンプルでは、Bootstrap4をVueで利用するためのBootstrap-Vueを利用している。<br/>
+            シンプルにBootstrapを利用する方法とは全く異なるため、きちんと<a href="https://bootstrap-vue.js.org/docs/components/table">ドキュメント</a>を確認する必要がある。<br/>
+            <br/>
           </small>
-          <b-table sortable border striped hover :items="items" :fields="fields"></b-table>
+          <b-table sortable border striped hover :busy.sync="isBusy" :items="fetchData" :fields="fields"></b-table>
         </div>
       </div>
     </article>
@@ -15,35 +20,44 @@
 </template>
 
 <script>
-
+var Client = require('node-rest-client').Client
+var client = new Client()
 export default {
   name: 'ExampleTable',
-  data() {
+  data () {
     return {
-      // Note 'isActive' is left out and will not appear in the rendered table
       fields: {
-        last_name: {
-          label: 'Person last name',
-          sortable: true
-        },
-        first_name: {
-          label: 'Person first name',
+        name: {
+          label: '氏名',
           sortable: false
         },
-        foo: {
-          // This key overrides `foo`!
-          key: 'age',
-          label: 'Person age',
+        contact_number: {
+          label: '電話番号',
           sortable: true
         },
-        city: {
-          key: 'address.city'
-        },
-        'address.country': {
-          label: 'Country'
+        mail_address: {
+          label: 'メールアドレス',
+          sortable: true
         }
       },
-      items: [
+      items: null,
+      loading: false,
+      error: null
+    }
+  },
+  mounted () {
+    this.$store.state.menu = 'table'
+  },
+  methods: {
+    fetchData (ctx) {
+      client.get('http://localhost:3000/api/profiles',
+        function (data, response) {
+          // parsed response body as js object
+          console.log(data)
+          // raw response
+          console.log(response)
+        })
+      return [
         {
           isActive: true,
           age: 40,
@@ -74,9 +88,6 @@ export default {
         }
       ]
     }
-  },
-  mounted () {
-    this.$store.state.menu = 'table'
   }
 }
 </script>

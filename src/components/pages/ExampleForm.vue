@@ -5,70 +5,107 @@
     <div class="row">
       <div class="col-md-12 text-left">
         <h2>Example&nbsp;Form</h2>
+        <b-alert :show="dismissCountDown"
+                 dismissible
+                 variant="success"
+                 @dismissed="dismissCountDown=0"
+                 @dismiss-count-down="countDownChanged">
+          <p>{{ $t("form.messages.normal_result_message") }} {{dismissCountDown}} seconds...</p>
+          <b-progress variant="success"
+                      :max="dismissSecs"
+                      :value="dismissCountDown"
+                      height="4px">
+          </b-progress>
+        </b-alert>
         <b-form @submit="onSubmit" @reset="onReset" v-if="show">
-          <!--- Email -->
-          <b-form-group id="exampleInputGroup1" label="Email address:" label-for="exampleInput1"
-                        description="We'll never share your email with anyone else.">
-            <b-form-input id="exampleInput1" type="email" v-model="form.email" required placeholder="Enter email"/>
-          </b-form-group>
           <!--- Name -->
-          <b-form-group id="exampleInputGroup2"  label="Your Name:"  label-for="exampleInput2">
-            <b-form-input id="exampleInput2" type="text" v-model="form.name" required placeholder="Enter name">
+          <label>{{ $t("form.name") }}:</label>
+          <b-form-group id="nameGroup" label-for="name">
+            <b-form-input id="name" type="text" v-model="form.name" required >
             </b-form-input>
           </b-form-group>
-          <!-- Food -->
-          <b-form-group id="exampleInputGroup3" label="Food:" label-for="exampleInput3">
-            <b-form-select id="exampleInput3" :options="foods" required v-model="form.food">
-            </b-form-select>
+          <!--- Email -->
+          <label>{{ $t("form.mail_address") }}:</label>
+          <b-form-group id="mailaddressGroup" label-for="mailaddress">
+            <b-form-input id="mailaddress" type="email" v-model="form.mail_address" required/>
           </b-form-group>
-          <b-form-group id="exampleGroup4">
-            <b-form-checkbox-group v-model="form.checked" id="exampleChecks">
-              <b-form-checkbox value="me">Check me out</b-form-checkbox>
-              <b-form-checkbox value="that">Check that out</b-form-checkbox>
-            </b-form-checkbox-group>
+          <!-- ContactNumber -->
+          <label>{{ $t("form.contact_number") }}:</label>
+          <b-form-group id="contactNumberGroup" label-for="contact_number">
+            <b-form-input  id="contact_number" type="text" required v-model="form.contact_number" />
           </b-form-group>
-          <b-button type="submit" variant="info">Submit</b-button>
-          <b-button type="reset" variant="warning">Reset</b-button>
+          <!-- ZipCode -->
+          <label>{{ $t("form.zip_code") }}:</label>
+          <b-form-group id="zipCodeGroup" label-for="zip_code">
+            <b-form-input  id="zip_code" type="text" required v-model="form.zip_code" />
+          </b-form-group>
+          <!-- Address -->
+          <label>{{ $t("form.address") }}:</label>
+          <b-form-group id="addressGroup" label-for="address">
+            <b-form-input  id="address" type="text" required v-model="form.address"/>
+          </b-form-group>
+          <b-button type="submit" variant="info">{{ $t("form.submit")}}</b-button>
+          <b-button type="reset" variant="warning">{{ $t("form.reset")}}</b-button>
         </b-form>
       </div>
     </div>
+    <b-btn @click="showAlert" variant="info" class="m-1">
+      Show alert with count-down timer
+    </b-btn>
     </article>
   </main>
 </template>
 
 <!-- Script部 -->
 <script>
+var Client = require('node-rest-client').Client
+var client = new Client()
 export default {
   data () {
     return {
       form: {
-        email: '',
-        name: '',
-        food: null,
-        checked: []
+        name: null,
+        contact_number: null,
+        mail_address: null,
+        zip_code: null,
+        address: null
       },
-      foods: [
-        { text: 'Select One', value: null },
-        'Carrots', 'Beans', 'Tomatoes', 'Corn'
-      ],
-      show: true
+      show: true,
+      dismissSecs: 10,
+      dismissCountDown: 0
     }
   },
   methods: {
     onSubmit (evt) {
       evt.preventDefault()
-      alert(JSON.stringify(this.form))
+      // POSTするデータの作成
+      var args = {
+        data: JSON.stringify(this.form),
+        headers: { 'Content-Type': 'application/json' }
+      }
+      // POST
+      client.post('http://localhost:3000/api/profiles', args,
+        function (data, response) {
+          this.$router.push({ path: '/' })
+        })
+      this.dismissCountDown = this.dismissSecs
     },
+    // フォームリセット処理
     onReset (evt) {
       evt.preventDefault()
-      /* Reset our form values */
-      this.form.email = ''
-      this.form.name = ''
-      this.form.food = null
-      this.form.checked = []
-      /* Trick to reset/clear native browser form validation state */
+      this.form.mail_address = null
+      this.form.name = null
+      this.form.contact_number = null
+      this.address = null
       this.show = false
       this.$nextTick(() => { this.show = true })
+    },
+    // メッセージのカウンタの
+    countDownChanged (dismissCountDown) {
+      this.dismissCountDown = dismissCountDown
+    },
+    showAlert () {
+      this.dismissCountDown = this.dismissSecs
     }
   },
   mounted () {

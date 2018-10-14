@@ -47,4 +47,22 @@ npm run e2e
 npm test
 ```
 
+### サーバーサイドのサンプル
+Vue.jsの学習はクライアントサイドに焦点を当てるが、
+サーバーサイドのサンプルも存在しなければクライアント・サーバの学習ができない。  
+そのためサーバサイド実装として簡易的にAPIを公開することのできる「Loopback」を利用している。  
+永続化はしていないため、起動毎にデータは揮発する。  
+サーバサイドの起動方法は以下。
+```bash
+cd loopback/hello-world
+node .
+```
+上記コマンドが正常に終了した場合には、以下のURLでREST-APIの一覧が確認できる。（SwaggerUI）
+http://localhost:3000/explorer
+
+実際のエンドポンとは、以下となる。
+http://localhost:3000
+
+
+
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

@@ -1,0 +1,19 @@
+{
+  "index": {
+    "title": "サンプル インデックスページ"
+  },
+  "form": {
+    "name": "名前",
+    "contact_number": "電話番号",
+    "mail_address": "メールアドレス",
+    "zip_code": "郵便番号",
+    "address": "住所",
+    "submit": "登録",
+    "reset": "リセット",
+    "messages" : {
+      "normal_result_message": "正常に登録が完了しました。"
+    }
+  }
+
+
+}
